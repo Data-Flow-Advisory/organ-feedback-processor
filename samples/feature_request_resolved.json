@@ -1,0 +1,16 @@
+{
+  "state": {
+    "status": "completed",
+    "answer_count": 1,
+    "summary": "It would be great to export the blueprint as a PDF.",
+    "transcript": [
+      {"question": "What would make this better?", "answer": "A PDF export option"}
+    ],
+    "source_interview_id": 1188,
+    "user": {"email": "neil.mcshane@av-dawson.com", "display_name": "Neil McShane"},
+    "facts": [
+      {"theme": "feature_request", "fact": "Add PDF export for blueprints"},
+      {"theme": "action_taken", "fact": "Feedback actioned: shipped PDF export in PR #1450", "actioned_at": "2026-06-05T10:00:00Z", "actioned_by": "Matt", "evidence": "https://github.com/Data-Flow-Advisory/discovery-engine/pull/1450", "status": "resolved"}
+    ]
+  }
+}

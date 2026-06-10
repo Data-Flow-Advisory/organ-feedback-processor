@@ -1,0 +1,19 @@
+{
+  "state": {
+    "status": "completed",
+    "answer_count": 3,
+    "summary": "The Save button crashes the whole page when I have more than 10 rows.",
+    "transcript": [
+      {"question": "What were you trying to do?", "answer": "Save a long blueprint"},
+      {"question": "What happened?", "answer": "The page crashed and I lost everything"}
+    ],
+    "source_interview_id": 1201,
+    "user": {"email": "ruth@yourpropertyzone.com", "display_name": "Ruth Grierson"},
+    "facts": [
+      {"theme": "bug_description", "fact": "Save button crashes the page on >10 rows"},
+      {"theme": "reproduction_steps", "fact": "Add 11 rows, click Save"},
+      {"theme": "severity", "fact": "Total data loss, I can't use the tool"},
+      {"theme": "context", "evidence": "{\"url\": \"https://app.dataflowadvisory.com/blueprint\", \"consoleErrors\": [\"Uncaught TypeError: rows is undefined\"], \"networkErrors\": [\"500 /api/save\"], \"viewport\": \"1440x900\", \"browser\": \"Chrome 124\"}"}
+    ]
+  }
+}

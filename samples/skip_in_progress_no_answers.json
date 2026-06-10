@@ -1,0 +1,13 @@
+{
+  "state": {
+    "status": "in_progress",
+    "answer_count": 0,
+    "summary": "",
+    "transcript": [],
+    "source_interview_id": 1303,
+    "user": {"email": "anon.session.internal", "display_name": "Anonymous"},
+    "facts": [
+      {"theme": "context", "evidence": "{\"url\": \"https://app.dataflowadvisory.com/\", \"viewport\": \"390x844\"}"}
+    ]
+  }
+}
