@@ -1,0 +1,23 @@
+{
+  "_README": "Typed connection ports for this organ (the Lego studs). See the connection standard: orchestrator/CONNECTORS.md. `name` is the literal key decide() reads under `state` (inputs) / writes under `output` (outputs); `type` names a connection type in the shared vocabulary (types.json) — two ports connect iff their `type` matches.",
+  "_checked": {
+    "_README": "Corpus + OSS freshness manifest read by scripts/corpus_oss_sweep.py (discovery-engine). `corpus_checked` = last verification this organ still mirrors its discovery-engine source module; `oss_checked` = last comparison against the open-source market. Stale dates re-enqueue an audit. See discovery-engine/docs/architecture/corpus-oss-sweep.md.",
+    "corpus_checked": "2026-06-11",
+    "oss_checked": "2026-06-11",
+    "corpus_verdict": "keep",
+    "oss_verdict": "keep",
+    "source_module": "app/services/feedback_processor.py"
+  },
+  "inputs": [
+    {"name": "transcript", "type": "InterviewTranscript", "required": false},
+    {"name": "facts", "type": "KeyFacts", "required": false}
+  ],
+  "outputs": [
+    {"name": "issue", "type": "FeedbackIssue"}
+  ],
+  "_non_ports": {
+    "_README": "Keys decide() reads/writes that are NOT typed connection studs — scalar control fields and submitter identity that travel alongside a port payload but do not couple to another organ. Documented (not minted as new types) to keep the vocabulary from sprawling. See CONNECTORS.md, 'Standard before scale'.",
+    "inputs": ["status", "answer_count", "summary", "source_interview_id", "user"],
+    "outputs": ["process", "skip_reason"]
+  }
+}

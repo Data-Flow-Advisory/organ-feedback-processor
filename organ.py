@@ -75,6 +75,20 @@ def decide(state: dict, context: dict | None = None) -> dict:
         source_interview_id = state.get("source_interview_id")
         user = state.get("user") or None
 
+        # --- Typed-port tolerance (see ports.json / CONNECTORS.md) ----------
+        # The `facts` input port has type KeyFacts ({"facts": [...]}) and the
+        # `transcript` port type is InterviewTranscript ({"interview_id", "qa"}).
+        # Historically callers hand this organ the *inner* arrays directly, and
+        # every sample still does. Accept the typed wrapper too, so the ports are
+        # real studs: any KeyFacts / InterviewTranscript producer snaps straight
+        # in without a hand-written adapter. Bare lists are unchanged.
+        if isinstance(facts, dict):
+            facts = facts.get("facts") or []
+        if isinstance(transcript, dict):
+            if source_interview_id is None:
+                source_interview_id = transcript.get("interview_id")
+            transcript = transcript.get("qa") or []
+
         # --- Gate 1: status must be processable -----------------------------
         if status not in _PROCESSABLE_STATUSES:
             return _skip(
