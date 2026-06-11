@@ -5,6 +5,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 ORGAN = Path(__file__).parent / "organ.py"
 _spec = importlib.util.spec_from_file_location("feedback_organ", ORGAN)
 organ = importlib.util.module_from_spec(_spec)
@@ -259,3 +261,112 @@ def test_entrypoint_rejects_malformed_input():
         input="not json", capture_output=True, text=True,
     )
     assert p.returncode == 1
+
+
+# --------------------------------------------------------------------------- #
+# Sample conformance — PIN each committed sample to its verdict.               #
+#                                                                              #
+# The conformance Action only shadow-PRINTS sample output to the job summary;  #
+# it never asserts. Without this test a sample verdict (or the organ logic     #
+# that produces it) could flip and CI would stay green. These assertions are   #
+# the actual gate.                                                             #
+# --------------------------------------------------------------------------- #
+
+SAMPLES_DIR = Path(__file__).parent / "samples"
+
+# Pinned verdict per sample file. Keys must stay in lock-step with the files
+# on disk (see test_sample_set_matches_pins for the drift guard).
+_EXPECTED = {
+    "bug_critical.json": {
+        "process": True,
+        "skip_reason": None,
+        "type": "bug",
+        "severity": "critical",
+        "action_status": "open",
+        "title": "Save button crashes the page on >10 rows",
+        "page_url": "https://app.dataflowadvisory.com/blueprint",
+        "user_email": "ruth@yourpropertyzone.com",
+        "decision_path": "processed",
+        "confidence": 1.0,
+    },
+    "feature_request_resolved.json": {
+        "process": True,
+        "skip_reason": None,
+        "type": "feature_request",
+        "severity": "minor",
+        "action_status": "resolved",
+        "title": "It would be great to export the blueprint as a PDF.",
+        "page_url": None,
+        "user_email": "neil.mcshane@av-dawson.com",
+        "decision_path": "processed",
+        "confidence": 1.0,
+    },
+    "improvement_actioned.json": {
+        "process": True,
+        "skip_reason": None,
+        "type": "improvement",
+        "severity": "minor",
+        "action_status": "actioned",
+        "title": "The dashboard feels sluggish when I switch between tenants.",
+        "page_url": None,
+        # Internal synthetic email must be scrubbed.
+        "user_email": None,
+        "decision_path": "processed",
+        "confidence": 1.0,
+    },
+    "skip_in_progress_no_answers.json": {
+        "process": False,
+        "skip_reason": "in_progress_no_answers",
+        "type": None,
+        "severity": None,
+        "action_status": None,
+        "title": None,
+        "page_url": None,
+        "user_email": None,
+        "decision_path": "answer_gate",
+        "confidence": 1.0,
+    },
+}
+
+
+def _load_sample(name):
+    payload = json.loads((SAMPLES_DIR / name).read_text())
+    return organ.decide(payload["state"], payload.get("context"))
+
+
+@pytest.mark.parametrize("name", sorted(_EXPECTED))
+def test_samples_conform(name):
+    exp = _EXPECTED[name]
+    r = _load_sample(name)
+    out, sm = r["output"], r["self_metric"]
+
+    assert out["process"] is exp["process"], name
+    assert out["skip_reason"] == exp["skip_reason"], name
+    assert sm["decision_path"] == exp["decision_path"], name
+    assert sm["confidence"] == exp["confidence"], name
+
+    issue = out["issue"]
+    if exp["process"]:
+        assert issue is not None, name
+        assert issue["type"] == exp["type"], name
+        assert issue["severity"] == exp["severity"], name
+        assert issue["action_status"] == exp["action_status"], name
+        assert issue["title"] == exp["title"], name
+        assert issue["page_url"] == exp["page_url"], name
+        assert issue["user_email"] == exp["user_email"], name
+        # self_metric mirrors the issue triage fields.
+        assert sm["feedback_type"] == exp["type"], name
+        assert sm["severity"] == exp["severity"], name
+        assert sm["action_status"] == exp["action_status"], name
+    else:
+        assert issue is None, name
+
+
+def test_sample_set_matches_pins():
+    """Drift guard: every sample on disk is pinned, and vice versa."""
+    on_disk = {p.name for p in SAMPLES_DIR.glob("*.json")}
+    pinned = set(_EXPECTED)
+    assert on_disk == pinned, (
+        f"sample/pin drift: on_disk-only={on_disk - pinned}, "
+        f"pinned-only={pinned - on_disk}"
+    )

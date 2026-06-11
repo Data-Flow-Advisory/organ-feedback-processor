@@ -1,0 +1,17 @@
+{
+  "state": {
+    "status": "completed",
+    "answer_count": 2,
+    "summary": "The dashboard feels sluggish when I switch between tenants.",
+    "transcript": [
+      {"question": "What were you doing?", "answer": "Switching between two client workspaces"},
+      {"question": "What did you notice?", "answer": "A few seconds of lag each time"}
+    ],
+    "source_interview_id": 1377,
+    "user": {"email": "qa.bot.session.internal", "display_name": "QA Bot"},
+    "facts": [
+      {"theme": "general", "fact": "Tenant switch is slow"},
+      {"theme": "action_taken", "fact": "Feedback actioned: profiling the switch path", "actioned_at": "2026-06-08T09:00:00Z", "actioned_by": "Matt", "status": "in_progress"}
+    ]
+  }
+}

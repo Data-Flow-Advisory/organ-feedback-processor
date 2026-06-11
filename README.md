@@ -129,4 +129,7 @@ python -m pytest -q
 
 See [`CONTRACT.md`](https://github.com/Data-Flow-Advisory) in the orchestrator for
 the full organ interface. Conformance (shadow-run on the committed samples + the
-test suite) runs in CI via `.github/workflows/conformance.yml`.
+test suite) runs in CI via `.github/workflows/conformance.yml`. Every committed
+sample is pinned to its expected verdict by `test_samples_conform` (with a
+sample/pin drift guard), so the test suite — not just the report-only shadow-run —
+gates against a verdict flip.
